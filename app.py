@@ -18,7 +18,7 @@ def main():
         init_cities()
     cities_list = get_cities_list()
     if cities_list:
-        time_delta = int(config['SCHEDULER']['time_delta_hours'])
+        time_delta = int(config['SCHEDULER']['time_delta'])
         schedule.every(time_delta).hours.do(job, cities_list)
         while True:
             schedule.run_pending()
