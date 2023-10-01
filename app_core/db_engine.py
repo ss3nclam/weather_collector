@@ -1,11 +1,7 @@
-from configparser import ConfigParser
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-
-config = ConfigParser()
-config.read('config.conf')
+from app_core.settings import config
 
 
 def create(config):
