@@ -12,9 +12,9 @@ pip install -r requirements.txt
 ## Setting up the app
 1. Remove **_example_** prefix from the name of the file **example_config.conf**
 2. Configure the file **config.conf**:
-    1. Setup all the parts where have "change_me"
-    2. Change **time_delta** parameter if you need another time delta for refreshing weather (in hours)
-    3. Change **logs_to_file** on **false** if you don't need to write logs to logs' folder
+    * Setup all the parts where have "change_me"
+    * Change **time_delta** parameter if you need another time delta for refreshing weather (in hours)
+    * Change **logs_to_file** on **false** if you don't need to write logs to logs' folder
 3. Use **migration.py** for configure your database:
 ```
 python migration.py
