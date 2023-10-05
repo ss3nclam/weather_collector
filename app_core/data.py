@@ -1,11 +1,12 @@
 import logging
+import time
 from datetime import datetime
 
 import requests
-from sqlalchemy import select, delete
+from sqlalchemy import inspect, select
 
-from app_core.db_engine import session
-from app_core.db_models import City, Weather
+from app_core.db_engine import engine, session
+from app_core.db_models import City, Weather, create_tables
 from app_core.settings import config
 
 
@@ -17,20 +18,6 @@ def check_cities_table():
         if cities_list:
             logging.info('The list of cities has been discovered!')
             return True
-
-            # if len(cities_list) == config['APP']['cities_limit']:
-            #     logging.info('The list of cities has been discovered!')
-            #     return True
-            # else:
-            #     logging.critical('Need to rewrite cities table!')
-            #     logging.info('The cities\' list rewriting..')
-            #     try:
-            #         session.execute(delete(City))
-            #         logging.nfo('Successfully rewrited!')
-            #         return False
-            #     except Exception as error:
-            #         logging.error(error)
-            #         return
         else:
             logging.info('The list of cities has not been discovered.')
             return False
@@ -63,6 +50,28 @@ def init_cities():
         logging.error(error)
 
 
+def validate_db():
+    db_name = config['DATABASE']['db_name']
+    logging.info('Checking db connection..')
+    try:
+        connection = engine.connect()
+        logging.info('Connection established!')
+    except Exception as error:
+        logging.error(error)
+        logging.info('Waiting db connection (15 sec)..')
+        time.sleep(15)
+        validate_db()
+    else:
+        logging.info('Checking tables..')
+        inspector = inspect(engine)
+        if inspector.has_table('cities', db_name) and inspector.has_table('weather', db_name):
+            logging.info('OK')
+        else:
+            create_tables()
+        if not check_cities_table():
+            init_cities()
+
+
 def get_cities_list():
     logging.info('Getting the list of cities..')
     try:
@@ -77,35 +86,41 @@ def get_cities_list():
         return
 
 
-def get_weather(id, name, longitude, latitude):
-    logging.info(f'Getting the weather for [id={id}, name={name}]..')
+def get_weather(name, longitude, latitude):
+    logging.info(f'Getting the weather for name={name}..')
     req_param = {
     'appid':config['OPEN_WEATHER_API']['appid'],
-    'units':config['OPEN_WEATHER_API']['units'],
+    'units':'metric',
     'lat':latitude,
     'lon':longitude
     }
     try:
         request = requests.get("http://api.openweathermap.org/data/2.5/weather", params=req_param)
         logging.info('Successfully gotten!')
-        return request.json().get('main')
+        return request.json()
     except Exception as error:
-        logging.error(f'Can\'t get the weather for [id={id}, name={name}] - {error}')
+        logging.error(f'Can\'t get the weather for name={name} - {error}')
         return
 
 
-def commit_weather(city_id, name, weather_info):
-    logging.info(f'Commiting weather info for city [id={city_id}, name={name}]..')
+def commit_weather(name, weather_info):
+    logging.info(f'Commiting weather info for city name={name}..')
+    w_main = weather_info.get('main')
+    w_wind = weather_info.get('wind')
     try:
         weather = Weather(
-            city_id=city_id,
-            temp=weather_info['temp'],
-            temp_min=weather_info['temp_min'],
-            temp_max=weather_info['temp_max'],
+            city=name,
+            temp=w_main['temp'],
+            temp_min=w_main['temp_min'],
+            temp_max=w_main['temp_max'],
+            wind_speed=w_wind['speed'],
+            wind_deg=w_wind['deg'],
+            pressure=w_main['pressure'],
+            humidity=w_main['humidity'],
             added_at=datetime.now()
             )
         session.add(weather)
         session.commit()
         logging.info('Successfully!')
     except Exception as error:
-        logging.error(f'Can\'t commit the weather for [id={city_id}, name={name}] - {error}')
+        logging.error(f'Can\'t commit the weather for name={name} - {error}')

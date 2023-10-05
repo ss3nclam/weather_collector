@@ -1,29 +1,30 @@
-# Installation
-## Requirements
-### Python
-For stable working need **version 3.11.5**
+# GUID
 
-### Packages
-Use **requirements.txt** for fast installation:
-```
-pip install -r requirements.txt
-```
+## Installation and setting up the app
 
-## Setting up the app
+1. You have to download and install [**Docker**](https://www.docker.com/get-started/).
+2. Download the [**Project**](https://github.com/ss3nclam/ex_test).
+3. Open the project's folder.
 1. Remove **_example_** prefix from the name of the file **example_config.conf**
 2. Configure the file **config.conf**:
-    * Setup all the parts where have "change_me"
-    * Change **time_delta** parameter if you need another time delta for refreshing weather (in hours)
-    * Change **logs_to_file** on **false** if you don't need to write logs to logs' folder
-3. Use **migration.py** for configure your database:
+    * Setup all the parts from section **DATABASE**
+    * Repeat the previous settings for db in _docker-compose.yml_ file.
+    * Copy your OpenWeather token to **appid** parameter from section **OPEN_WEATHER_API**
+    * Change **scheduler_time_delta** parameter in section **APP** if you need another time delta for refreshing weather (in hours).
+    * Change **cities_limit** parameter if you need another count of cities _(default: 50)_.
+3. From project folder run command:
+
+
 ```
-python migration.py
+docker-compose build
 ```
 
-# Using
-Use this command for start app:
+## Using the app
+
+
+From project folder run command:
 ```
-python app.py
+docker-compose up
 ```
 
 

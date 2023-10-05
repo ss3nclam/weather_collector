@@ -1,0 +1,34 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: weather_collector
+    ports:
+      - 5432:5432
+    networks:
+      - mynet
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - mynet
+
+  app:
+    image: python:3.11.6
+    build: .
+    depends_on:
+      - db
+    networks:
+      - mynet
+
+networks:
+  mynet:

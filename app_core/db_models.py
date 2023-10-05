@@ -17,20 +17,24 @@ class City(Base):
     timezone: Mapped[str] = mapped_column(String(50), nullable=False)
 
     def __repr__(self) -> str:
-        return f"id={self.id!r}, longitude={self.longitude!r}, latitude={self.latitude!r}"
+        return f"id={self.id!r}, name={self.name!r}, longitude={self.longitude!r}, latitude={self.latitude!r}"
 
 
 class Weather(Base):
     __tablename__ = 'weather'
     id: Mapped[int] = mapped_column(Integer(), primary_key=True, nullable=False, unique=True, autoincrement=True)
-    city_id: Mapped[int] = mapped_column(Integer(), ForeignKey('cities.id'), nullable=False, )
+    city: Mapped[str] = mapped_column(String(45), nullable=False)
     temp: Mapped[float] = mapped_column(Float(), nullable=False)
     temp_min: Mapped[float] = mapped_column(Float(), nullable=False)
     temp_max: Mapped[float] = mapped_column(Float(), nullable=False)
+    wind_speed: Mapped[float] = mapped_column(Float(), nullable=False)
+    wind_deg: Mapped[int] = mapped_column(Integer(), nullable=False)
+    pressure: Mapped[int] = mapped_column(Integer(), nullable=False)
+    humidity: Mapped[int] = mapped_column(Integer(), nullable=False)
     added_at = mapped_column(DateTime())
 
     def __repr__(self) -> str:
-        return f"city_id={self.id!r}, temp={self.temp!r}, "
+        return f"city={self.city!r}, temp={self.temp!r}"
 
 
 def create_tables():
