@@ -1,4 +1,4 @@
-# GUID
+# GUIDE
 
 ## Installation and setting up the app
 
